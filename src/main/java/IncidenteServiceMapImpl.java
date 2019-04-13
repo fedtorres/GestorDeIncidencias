@@ -1,5 +1,6 @@
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class IncidenteServiceMapImpl implements IncidenteService {
 
@@ -30,26 +31,43 @@ public class IncidenteServiceMapImpl implements IncidenteService {
     }
 
     public Incidente editEstado(int id) {
-        Incidente
+        Incidente incidenteEditar = incidenteMap.get(id);
+        incidenteEditar.setEstado(Estado.RESUELTO);
+        return incidenteEditar;
     }
 
-    public Collection<Incidente> getIncidentePorResponsable(int userId) {
-        return null;
+    public Collection<Incidente> getIncidentesPorResponsable(int usuarioId) {
+        return incidenteMap.values()
+                .stream()
+                .filter(i -> i.getResponsable().getId() == usuarioId)
+                .collect(Collectors.toList());
     }
 
-    public Collection<Incidente> getIncidentePorReportador(int userId) {
-        return null;
+    public Collection<Incidente> getIncidentesPorReportador(int usuarioId) {
+        return incidenteMap.values()
+                .stream()
+                .filter(i -> i.getReportador().getId() == usuarioId)
+                .collect(Collectors.toList());
     }
 
-    public Collection<Incidente> getIncidentePorProyecto(int proyectoId) {
-        return null;
+    public Collection<Incidente> getIncidentesPorProyecto(int proyectoId) {
+        return incidenteMap.values()
+                .stream()
+                .filter(i -> i.getProyecto().getId() == proyectoId)
+                .collect(Collectors.toList());
     }
 
     public Collection<Incidente> getIncidentesAbiertos() {
-        return null;
+        return incidenteMap.values()
+                .stream()
+                .filter(i -> i.getEstado() == Estado.ASIGNADO)
+                .collect(Collectors.toList());
     }
 
     public Collection<Incidente> getIncidentesResueltos() {
-        return null;
+        return incidenteMap.values()
+                .stream()
+                .filter(i -> i.getEstado() == Estado.RESUELTO)
+                .collect(Collectors.toList());
     }
 }

@@ -1,5 +1,6 @@
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class ProyectoServiceMapImpl implements ProyectoService {
 
@@ -37,7 +38,9 @@ public class ProyectoServiceMapImpl implements ProyectoService {
     }
 
     public Collection<Proyecto> getProyectoPorUsuario(int usuarioId) {
-        // TODO
-        return null;
+        return proyectoMap.values()
+                .stream()
+                .filter(p -> p.getPropietario().getId() == usuarioId)
+                .collect(Collectors.toList());
     }
 }

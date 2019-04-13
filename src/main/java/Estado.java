@@ -3,17 +3,17 @@ public enum Estado {
     ASIGNADO ("Asignado"),
     RESUELTO ("Resuelto");
 
-    private String est;
+    private String estado;
 
-    Estado(String est) {
-        this.est = est;
+    Estado(String estado) {
+        this.estado = estado;
     }
 
-    public String getEst() {
-        return est;
+    public String getEstado() {
+        return estado;
     }
 
-    public void setEst(String est) {
-        this.est = est;
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }
