@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import com.sun.xml.internal.bind.api.impl.NameConverter;
+import jdk.net.SocketFlow;
 
 import static spark.Spark.*;
 
@@ -46,6 +47,26 @@ public class GestorDeIncidencias {
                     StatusResponse.SUCCESS,
                     new Gson().toJsonTree(
                             proyectoService.getProyectosPorUsuario(
+                                    Integer.parseInt(request.params(":id")))
+                    )));
+        });
+
+        get("/usuario/:id/incidentes/asignados", (request, response) -> {
+            response.type("application/json");
+            return new Gson().toJson(new StandardResponse(
+                    StatusResponse.SUCCESS,
+                    new Gson().toJsonTree(
+                            incidenteService.getIncidentesPorResponsable(
+                                    Integer.parseInt(request.params(":id")))
+                    )));
+        });
+
+        get("/usuario/:id/incidentes/creados", (request, response) -> {
+            response.type("application/json");
+            return new Gson().toJson(new StandardResponse(
+                    StatusResponse.SUCCESS,
+                    new Gson().toJsonTree(
+                            incidenteService.getIncidentesPorReportador(
                                     Integer.parseInt(request.params(":id")))
                     )));
         });
@@ -103,6 +124,16 @@ public class GestorDeIncidencias {
                     )));
         });
 
+        get("/proyecto/:id/incidentes", (request, response) -> {
+           response.type("application/json");
+           return new Gson().toJson(new StandardResponse(
+                   StatusResponse.SUCCESS,
+                   new Gson().toJsonTree(
+                           incidenteService.getIncidentesPorProyecto(
+                                   Integer.parseInt(request.params(":id")))
+                   )));
+        });
+
         put("/proyecto", (request, response) -> {
             response.type("application/json");
             Proyecto proyecto = new Gson().fromJson(request.body(), Proyecto.class);
@@ -129,6 +160,32 @@ public class GestorDeIncidencias {
                     "Integrante borrado"
             ));
         });
+
+        post("/incidente", (request, response) -> {
+            response.type("application/json");
+            Incidente incidente = new Gson().fromJson(request.body(), Incidente.class);
+            incidenteService.addIncidente(incidente);
+            return new Gson().toJson(new StandardResponse(
+                    StatusResponse.SUCCESS));
+        });
+
+        get("/incidente/abiertos", (request, response) -> {
+            response.type("application/json");
+            return new Gson().toJson(new StandardResponse(
+                    StatusResponse.SUCCESS,
+                    new Gson().toJsonTree(
+                            incidenteService.getIncidentesAbiertos()
+                    )));
+        });
+
+        get("/incidente/resueltos", (request, response) -> {
+            response.type("application/json");
+            return new Gson().toJson(new StandardResponse(
+                    StatusResponse.SUCCESS,
+                    new Gson().toJsonTree(
+                            incidenteService.getIncidentesResueltos()
+                    )));
+        });
     }
 
     private static void precargarDatos(
@@ -138,7 +195,25 @@ public class GestorDeIncidencias {
         usuarioService.addUsuario(new Usuario(1, "Tony", "Stark"));
         usuarioService.addUsuario(new Usuario(2, "Steve", "Rogers"));
         usuarioService.addUsuario(new Usuario(3, "Bruce", "Banner"));
-        proyectoService.addProyecto(new Proyecto(1, "Team Iron Man", usuarioService.getUsuario(1)));
-        proyectoService.addProyecto(new Proyecto(2, "Team Cap", usuarioService.getUsuario(2)));
+        proyectoService.addProyecto(new Proyecto(1, "Proyecto 1", usuarioService.getUsuario(1)));
+        proyectoService.addProyecto(new Proyecto(2, "Proyecto 2", usuarioService.getUsuario(2)));
+        incidenteService.addIncidente(new Incidente(
+                1,
+                Clasificacion.CRITICO,
+                "Incidente crítico",
+                usuarioService.getUsuario(3),
+                usuarioService.getUsuario(1),
+                Estado.ASIGNADO,
+                proyectoService.getProyecto(1)
+                ));
+        incidenteService.addIncidente(new Incidente(
+                2,
+                Clasificacion.NORMAL,
+                "Incidente normal",
+                usuarioService.getUsuario(3),
+                usuarioService.getUsuario(2),
+                Estado.RESUELTO,
+                proyectoService.getProyecto(2)
+        ));
     }
 }

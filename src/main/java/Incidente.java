@@ -11,6 +11,25 @@ public class Incidente {
     private Date fechaDeSolucion;
     private Proyecto proyecto;
 
+    public Incidente(
+            int id,
+            Clasificacion clasificacion,
+            String descripcion,
+            Usuario reportador,
+            Usuario responsable,
+            Estado estado,
+            Proyecto proyecto) {
+        this.id = id;
+        this.clasificacion = clasificacion;
+        this.descripcion = descripcion;
+        this.reportador = reportador;
+        this.responsable = responsable;
+        this.estado = estado;
+        this.proyecto = proyecto;
+        fechaDeCreacion = new Date();
+        fechaDeSolucion = null;
+    }
+
     public int getId() {
         return id;
     }
