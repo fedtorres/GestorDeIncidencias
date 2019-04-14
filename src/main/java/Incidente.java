@@ -12,14 +12,14 @@ public class Incidente {
     private Proyecto proyecto;
 
     public Incidente(
-            int id,
+            int incidenteId,
             Clasificacion clasificacion,
             String descripcion,
             int reportadorId,
             int responsableId,
             Estado estado,
             int proyectoId) {
-        this.id = id;
+        id = incidenteId;
         this.clasificacion = clasificacion;
         this.descripcion = descripcion;
         UsuarioService usuarioService = UsuarioServiceMapImpl.getInstancia();

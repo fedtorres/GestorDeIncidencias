@@ -1,6 +1,6 @@
-import com.google.gson.Gson;
-import com.sun.xml.internal.bind.api.impl.NameConverter;
-import jdk.net.SocketFlow;
+import com.google.gson.*;
+
+import java.lang.reflect.Type;
 
 import static spark.Spark.*;
 
@@ -14,28 +14,67 @@ public class GestorDeIncidencias {
 
         precargarDatos(usuarioService, proyectoService, incidenteService);
 
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        JsonDeserializer<Proyecto> proyectoDeserializer = new JsonDeserializer<Proyecto>() {
+            @Override
+            public Proyecto deserialize(
+                    JsonElement jsonElement,
+                    Type type,
+                    JsonDeserializationContext jsonDeserializationContext)
+                    throws JsonParseException {
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                return new Proyecto(
+                        jsonObject.get("proyectoId").getAsInt(),
+                        jsonObject.get("titulo").getAsString(),
+                        jsonObject.get("propietarioId").getAsInt()
+                );
+            }
+        };
+        JsonDeserializer<Incidente> incidenteDeserializer = new JsonDeserializer<Incidente>() {
+            @Override
+            public Incidente deserialize(
+                    JsonElement jsonElement,
+                    Type type,
+                    JsonDeserializationContext jsonDeserializationContext)
+                    throws JsonParseException {
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                return new Incidente(
+                        jsonObject.get("incidenteId").getAsInt(),
+                        Clasificacion.valueOf(jsonObject.get("clasificacion").getAsString()),
+                        jsonObject.get("descripcion").getAsString(),
+                        jsonObject.get("reportadorId").getAsInt(),
+                        jsonObject.get("responsableId").getAsInt(),
+                        Estado.valueOf(jsonObject.get("estado").getAsString()),
+                        jsonObject.get("proyectoId").getAsInt()
+                );
+            }
+        };
+        gsonBuilder.registerTypeAdapter(Proyecto.class, proyectoDeserializer);
+        gsonBuilder.registerTypeAdapter(Incidente.class, incidenteDeserializer);
+        Gson customGson = gsonBuilder.create();
+
         post("/usuario", (request, response) -> {
             response.type("application/json");
-            Usuario usuario = new Gson().fromJson(request.body(), Usuario.class);
+            Usuario usuario = customGson.fromJson(request.body(), Usuario.class);
             usuarioService.addUsuario(usuario);
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS));
         });
 
         get("/usuario", (request, response) -> {
             response.type("application/json");
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
-                    new Gson().toJsonTree(
+                    customGson.toJsonTree(
                             usuarioService.getUsuarios()
                     )));
         });
 
         get("/usuario/:id", (request, response) -> {
             response.type("application/json");
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
-                    new Gson().toJsonTree(
+                    customGson.toJsonTree(
                             usuarioService.getUsuario(
                                     Integer.parseInt(request.params(":id")))
                     )));
@@ -43,9 +82,9 @@ public class GestorDeIncidencias {
 
         get("/usuario/:id/proyectos", (request, response) -> {
             response.type("application/json");
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
-                    new Gson().toJsonTree(
+                    customGson.toJsonTree(
                             proyectoService.getProyectosPorUsuario(
                                     Integer.parseInt(request.params(":id")))
                     )));
@@ -53,9 +92,9 @@ public class GestorDeIncidencias {
 
         get("/usuario/:id/incidentes/asignados", (request, response) -> {
             response.type("application/json");
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
-                    new Gson().toJsonTree(
+                    customGson.toJsonTree(
                             incidenteService.getIncidentesPorResponsable(
                                     Integer.parseInt(request.params(":id")))
                     )));
@@ -63,9 +102,9 @@ public class GestorDeIncidencias {
 
         get("/usuario/:id/incidentes/creados", (request, response) -> {
             response.type("application/json");
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
-                    new Gson().toJsonTree(
+                    customGson.toJsonTree(
                             incidenteService.getIncidentesPorReportador(
                                     Integer.parseInt(request.params(":id")))
                     )));
@@ -73,16 +112,16 @@ public class GestorDeIncidencias {
 
         put("/usuario", (request, response) -> {
             response.type("application/json");
-            Usuario usuario = new Gson().fromJson(request.body(), Usuario.class);
+            Usuario usuario = customGson.fromJson(request.body(), Usuario.class);
             Usuario usuarioEditado = usuarioService.editUsuario(usuario);
             if(usuario != null) {
-                return new Gson().toJson(new StandardResponse(
+                return customGson.toJson(new StandardResponse(
                         StatusResponse.SUCCESS,
-                        new Gson().toJsonTree(
+                        customGson.toJsonTree(
                                 usuarioEditado
                         )));
             } else {
-                return new Gson().toJson(new StandardResponse(
+                return customGson.toJson(new StandardResponse(
                         StatusResponse.ERROR,
                         "Error al editar el usuario."
                         ));
@@ -92,33 +131,33 @@ public class GestorDeIncidencias {
         delete("usuario/:id", (request, response) -> {
             response.type("application/json");
             usuarioService.deleteUsuario(Integer.parseInt(request.params(":id")));
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
                     "Integrante borrado."));
         });
 
         post("/proyecto", (request, response) -> {
             response.type("application/json");
-            Proyecto proyecto = new Gson().fromJson(request.body(), Proyecto.class);
+            Proyecto proyecto = customGson.fromJson(request.body(), Proyecto.class);
             proyectoService.addProyecto(proyecto);
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS));
         });
 
         get("/proyecto", (request, response) -> {
             response.type("application/json");
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
-                    new Gson().toJsonTree(
+                    customGson.toJsonTree(
                             proyectoService.getProyectos()
                     )));
         });
 
         get("/proyecto/:id", (request, response) -> {
             response.type("application/json");
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
-                    new Gson().toJsonTree(
+                    customGson.toJsonTree(
                             proyectoService.getProyecto(
                                     Integer.parseInt(request.params(":id")))
                     )));
@@ -126,9 +165,9 @@ public class GestorDeIncidencias {
 
         get("/proyecto/:id/incidentes", (request, response) -> {
            response.type("application/json");
-           return new Gson().toJson(new StandardResponse(
+           return customGson.toJson(new StandardResponse(
                    StatusResponse.SUCCESS,
-                   new Gson().toJsonTree(
+                   customGson.toJsonTree(
                            incidenteService.getIncidentesPorProyecto(
                                    Integer.parseInt(request.params(":id")))
                    )));
@@ -136,16 +175,16 @@ public class GestorDeIncidencias {
 
         put("/proyecto", (request, response) -> {
             response.type("application/json");
-            Proyecto proyecto = new Gson().fromJson(request.body(), Proyecto.class);
+            Proyecto proyecto = customGson.fromJson(request.body(), Proyecto.class);
             Proyecto proyectoEditado = proyectoService.editProyecto(proyecto);
             if(proyectoEditado != null) {
-                return new Gson().toJson(new StandardResponse(
+                return customGson.toJson(new StandardResponse(
                         StatusResponse.SUCCESS,
-                        new Gson().toJsonTree(
+                        customGson.toJsonTree(
                                 proyectoEditado
                         )));
             } else {
-                return new Gson().toJson(new StandardResponse(
+                return customGson.toJson(new StandardResponse(
                         StatusResponse.ERROR,
                         "Error al editar el proyecto."
                         ));
@@ -155,7 +194,7 @@ public class GestorDeIncidencias {
         delete("/proyecto/:id", (request, response) -> {
             response.type("application/json");
             proyectoService.deleteProyecto(Integer.parseInt(request.params(":id")));
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
                     "Integrante borrado"
             ));
@@ -163,26 +202,26 @@ public class GestorDeIncidencias {
 
         post("/incidente", (request, response) -> {
             response.type("application/json");
-            Incidente incidente = new Gson().fromJson(request.body(), Incidente.class);
+            Incidente incidente = customGson.fromJson(request.body(), Incidente.class);
             incidenteService.addIncidente(incidente);
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS));
         });
 
         get("/incidente/abiertos", (request, response) -> {
             response.type("application/json");
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
-                    new Gson().toJsonTree(
+                    customGson.toJsonTree(
                             incidenteService.getIncidentesAbiertos()
                     )));
         });
 
         get("/incidente/resueltos", (request, response) -> {
             response.type("application/json");
-            return new Gson().toJson(new StandardResponse(
+            return customGson.toJson(new StandardResponse(
                     StatusResponse.SUCCESS,
-                    new Gson().toJsonTree(
+                    customGson.toJsonTree(
                             incidenteService.getIncidentesResueltos()
                     )));
         });
