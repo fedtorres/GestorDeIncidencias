@@ -3,10 +3,18 @@ import java.util.HashMap;
 
 public class UsuarioServiceMapImpl implements UsuarioService {
 
+    private static UsuarioServiceMapImpl primeraInstancia = null;
     private HashMap<Integer, Usuario> usuarioMap;
 
-    public UsuarioServiceMapImpl() {
+    private UsuarioServiceMapImpl() {
         usuarioMap = new HashMap<Integer, Usuario>();
+    }
+
+    public static UsuarioServiceMapImpl getInstancia() {
+        if(primeraInstancia == null) {
+            primeraInstancia = new UsuarioServiceMapImpl();
+        }
+        return primeraInstancia;
     }
 
     public void addUsuario(Usuario usuario) {

@@ -8,8 +8,8 @@ public class GestorDeIncidencias {
 
     public static void main(String[] args) {
 
-        final UsuarioService usuarioService = new UsuarioServiceMapImpl();
-        final ProyectoService proyectoService = new ProyectoServiceMapImpl();
+        final UsuarioService usuarioService = UsuarioServiceMapImpl.getInstancia();
+        final ProyectoService proyectoService = ProyectoServiceMapImpl.getInstancia();
         final IncidenteService incidenteService = new IncidenteServiceMapImpl();
 
         precargarDatos(usuarioService, proyectoService, incidenteService);
@@ -195,25 +195,25 @@ public class GestorDeIncidencias {
         usuarioService.addUsuario(new Usuario(1, "Tony", "Stark"));
         usuarioService.addUsuario(new Usuario(2, "Steve", "Rogers"));
         usuarioService.addUsuario(new Usuario(3, "Bruce", "Banner"));
-        proyectoService.addProyecto(new Proyecto(1, "Proyecto 1", usuarioService.getUsuario(1)));
-        proyectoService.addProyecto(new Proyecto(2, "Proyecto 2", usuarioService.getUsuario(2)));
+        proyectoService.addProyecto(new Proyecto(1, "Proyecto 1", 1));
+        proyectoService.addProyecto(new Proyecto(2, "Proyecto 2", 2));
         incidenteService.addIncidente(new Incidente(
                 1,
                 Clasificacion.CRITICO,
                 "Incidente crítico",
-                usuarioService.getUsuario(3),
-                usuarioService.getUsuario(1),
+                3,
+                1,
                 Estado.ASIGNADO,
-                proyectoService.getProyecto(1)
+                1
                 ));
         incidenteService.addIncidente(new Incidente(
                 2,
                 Clasificacion.NORMAL,
                 "Incidente normal",
-                usuarioService.getUsuario(3),
-                usuarioService.getUsuario(2),
+                3,
+                2,
                 Estado.RESUELTO,
-                proyectoService.getProyecto(2)
+                2
         ));
     }
 }

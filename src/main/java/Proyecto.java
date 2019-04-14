@@ -3,10 +3,11 @@ public class Proyecto {
     private String titulo;
     private Usuario propietario;
 
-    public Proyecto(int id, String titulo, Usuario propietario) {
-        this.id = id;
+    public Proyecto(int proyectoId, String titulo, int propietarioId) {
+        id = proyectoId;
         this.titulo = titulo;
-        this.propietario = propietario;
+        UsuarioService usuarioService = UsuarioServiceMapImpl.getInstancia();
+        propietario = usuarioService.getUsuario(propietarioId);
     }
 
     public int getId() {

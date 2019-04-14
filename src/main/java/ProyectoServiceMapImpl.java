@@ -4,10 +4,18 @@ import java.util.stream.Collectors;
 
 public class ProyectoServiceMapImpl implements ProyectoService {
 
+    private static ProyectoServiceMapImpl primeraInstancia = null;
     private HashMap<Integer, Proyecto> proyectoMap;
 
-    public ProyectoServiceMapImpl() {
+    private ProyectoServiceMapImpl() {
         proyectoMap = new HashMap<Integer, Proyecto>();
+    }
+
+    public static ProyectoServiceMapImpl getInstancia() {
+        if(primeraInstancia == null) {
+            primeraInstancia = new ProyectoServiceMapImpl();
+        }
+        return primeraInstancia;
     }
 
     public void addProyecto(Proyecto proyecto) {

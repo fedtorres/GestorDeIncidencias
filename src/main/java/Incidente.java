@@ -15,19 +15,21 @@ public class Incidente {
             int id,
             Clasificacion clasificacion,
             String descripcion,
-            Usuario reportador,
-            Usuario responsable,
+            int reportadorId,
+            int responsableId,
             Estado estado,
-            Proyecto proyecto) {
+            int proyectoId) {
         this.id = id;
         this.clasificacion = clasificacion;
         this.descripcion = descripcion;
-        this.reportador = reportador;
-        this.responsable = responsable;
+        UsuarioService usuarioService = UsuarioServiceMapImpl.getInstancia();
+        reportador = usuarioService.getUsuario(reportadorId);
+        responsable = usuarioService.getUsuario(responsableId);
         this.estado = estado;
-        this.proyecto = proyecto;
         fechaDeCreacion = new Date();
         fechaDeSolucion = null;
+        ProyectoService proyectoService = ProyectoServiceMapImpl.getInstancia();
+        proyecto = proyectoService.getProyecto(proyectoId);
     }
 
     public int getId() {
