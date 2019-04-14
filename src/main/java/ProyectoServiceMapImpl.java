@@ -37,7 +37,7 @@ public class ProyectoServiceMapImpl implements ProyectoService {
         proyectoMap.remove(id);
     }
 
-    public Collection<Proyecto> getProyectoPorUsuario(int usuarioId) {
+    public Collection<Proyecto> getProyectosPorUsuario(int usuarioId) {
         return proyectoMap.values()
                 .stream()
                 .filter(p -> p.getPropietario().getId() == usuarioId)

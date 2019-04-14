@@ -7,5 +7,5 @@ public interface ProyectoService {
     public Proyecto getProyecto(int id);
     public Proyecto editProyecto(Proyecto proyecto);
     public void deleteProyecto(int id);
-    public Collection<Proyecto> getProyectoPorUsuario(int usuarioId);
+    public Collection<Proyecto> getProyectosPorUsuario(int usuarioId);
 }
