@@ -22,18 +22,32 @@ public class IncidenteServiceMapImpl implements IncidenteService {
         return incidenteMap.get(id);
     }
 
-    public Incidente patchTextoDescripcion(Incidente incidente) {
-        Incidente incidenteEditar = incidenteMap.get(incidente.getId());
-        if(incidente.getDescripcion() != null) {
-            incidenteEditar.setDescripcion(incidente.getDescripcion());
+    public Incidente patchTextoDescripcion(int id, String texto) throws IncidenteException {
+        try {
+            if (id == 0) {
+                throw new IncidenteException("El id no puede ser 0.");
+            }
+            Incidente incidentePatch = incidenteMap.get(id);
+            if (texto != null) {
+                incidentePatch.setDescripcion(incidentePatch.getDescripcion() + " " + texto);
+            }
+            return incidentePatch;
+        } catch (Exception exception) {
+            throw new IncidenteException(exception.getMessage());
         }
-        return incidenteEditar;
     }
 
-    public Incidente patchEstado(int id) {
-        Incidente incidenteEditar = incidenteMap.get(id);
-        incidenteEditar.setEstado(Estado.RESUELTO);
-        return incidenteEditar;
+    public Incidente patchEstado(int id) throws IncidenteException {
+        try {
+            if(id == 0) {
+                throw new IncidenteException("El id no puede ser 0.");
+            }
+            Incidente incidentePatch = incidenteMap.get(id);
+            incidentePatch.setEstado(Estado.RESUELTO);
+            return incidentePatch;
+        } catch (Exception exception) {
+            throw new IncidenteException(exception.getMessage());
+        }
     }
 
     public Collection<Incidente> getIncidentesPorResponsable(int usuarioId) {

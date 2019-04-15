@@ -29,15 +29,22 @@ public class UsuarioServiceMapImpl implements UsuarioService {
         return usuarioMap.get(id);
     }
 
-    public Usuario editUsuario(Usuario usuario) {
-        Usuario usuarioEditar = usuarioMap.get(usuario.getId());
-        if(usuario.getNombre() != null) {
-            usuarioEditar.setNombre(usuario.getNombre());
+    public Usuario editUsuario(Usuario usuario) throws UsuarioException {
+        try {
+            if(usuario.getId() == 0) {
+                throw new UsuarioException("El id no puede ser nulo.");
+            }
+            Usuario usuarioEditar = usuarioMap.get(usuario.getId());
+            if (usuario.getNombre() != null) {
+                usuarioEditar.setNombre(usuario.getNombre());
+            }
+            if (usuario.getApellido() != null) {
+                usuarioEditar.setApellido(usuario.getApellido());
+            }
+            return usuarioEditar;
+        } catch (Exception exception) {
+            throw new UsuarioException(exception.getMessage());
         }
-        if(usuario.getApellido() != null) {
-            usuarioEditar.setApellido(usuario.getApellido());
-        }
-        return usuarioEditar;
     }
 
     public void deleteUsuario(int id) {

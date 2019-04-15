@@ -30,15 +30,22 @@ public class ProyectoServiceMapImpl implements ProyectoService {
         return proyectoMap.get(id);
     }
 
-    public Proyecto editProyecto(Proyecto proyecto) {
-        Proyecto proyectoEditar = proyectoMap.get(proyecto.getId());
-        if(proyecto.getTitulo() != null) {
-            proyectoEditar.setTitulo(proyecto.getTitulo());
+    public Proyecto editProyecto(Proyecto proyecto) throws ProyectoException {
+        try {
+            if(proyecto.getId() == 0) {
+                throw new ProyectoException("El id no puede ser nulo.");
+            }
+            Proyecto proyectoEditar = proyectoMap.get(proyecto.getId());
+            if (proyecto.getTitulo() != null) {
+                proyectoEditar.setTitulo(proyecto.getTitulo());
+            }
+            if (proyecto.getPropietario() != null) {
+                proyectoEditar.setPropietario(proyecto.getPropietario());
+            }
+            return proyectoEditar;
+        } catch (Exception exception) {
+            throw new ProyectoException(exception.getMessage());
         }
-        if(proyecto.getPropietario() != null) {
-            proyectoEditar.setPropietario(proyecto.getPropietario());
-        }
-        return proyectoEditar;
     }
 
     public void deleteProyecto(int id) {

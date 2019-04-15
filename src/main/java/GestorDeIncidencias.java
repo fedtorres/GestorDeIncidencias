@@ -203,7 +203,7 @@ public class GestorDeIncidencias {
         delete("/proyecto/:id", (request, response) -> {
             response.type("application/json");
             int proyectoId = Integer.parseInt(request.params(":id"));
-            if(incidenteService.getIncidentesAbiertosPorProyecto(proyectoId).isEmpty()) {
+            if(incidenteService.getIncidentesPorProyecto(proyectoId).isEmpty()) {
                 proyectoService.deleteProyecto(proyectoId);
                 return customGson.toJson(new StandardResponse(
                         StatusResponse.SUCCESS,
@@ -241,6 +241,45 @@ public class GestorDeIncidencias {
                     customGson.toJsonTree(
                             incidenteService.getIncidentesResueltos()
                     )));
+        });
+
+        patch("/incidente/:id/descripcion", (request, response) -> {
+           response.type("application/json");
+           JsonParser jsonParser = new JsonParser();
+           JsonObject jsonObject = jsonParser.parse(request.body()).getAsJsonObject();
+           String texto = jsonObject.get("texto").getAsString();
+           Incidente incidentePatch = incidenteService.patchTextoDescripcion(
+                   Integer.parseInt(request.params(":id")),
+                   texto);
+            if(incidentePatch != null) {
+                return customGson.toJson(new StandardResponse(
+                        StatusResponse.SUCCESS,
+                        customGson.toJsonTree(
+                                incidentePatch
+                        )));
+            } else {
+                return customGson.toJson(new StandardResponse(
+                        StatusResponse.ERROR,
+                        "Error al añadir texto a la descripción del incidente."
+                ));
+            }
+        });
+
+        patch("/incidente/:id/resuelto", (request, response) -> {
+            response.type("application/json");
+            Incidente incidentePatch = incidenteService.patchEstado(Integer.parseInt(request.params(":id")));
+            if(incidentePatch != null) {
+                return customGson.toJson(new StandardResponse(
+                        StatusResponse.SUCCESS,
+                        customGson.toJsonTree(
+                                incidentePatch
+                        )));
+            } else {
+                return customGson.toJson(new StandardResponse(
+                        StatusResponse.ERROR,
+                        "Error al cambiar estado del incidente."
+                ));
+            }
         });
     }
 
