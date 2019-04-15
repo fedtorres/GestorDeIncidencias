@@ -130,10 +130,19 @@ public class GestorDeIncidencias {
 
         delete("usuario/:id", (request, response) -> {
             response.type("application/json");
-            usuarioService.deleteUsuario(Integer.parseInt(request.params(":id")));
-            return customGson.toJson(new StandardResponse(
-                    StatusResponse.SUCCESS,
-                    "Integrante borrado."));
+            int usuarioId = Integer.parseInt(request.params(":id"));
+            if(proyectoService.getProyectosPorUsuario(usuarioId).isEmpty()
+                    && incidenteService.getIncidentesPorReportador(usuarioId).isEmpty()
+                    && incidenteService.getIncidentesPorResponsable(usuarioId).isEmpty()) {
+                usuarioService.deleteUsuario(usuarioId);
+                return customGson.toJson(new StandardResponse(
+                        StatusResponse.SUCCESS,
+                        "Usuario borrado."));
+            } else {
+                return customGson.toJson(new StandardResponse(
+                        StatusResponse.ERROR,
+                        "Error al borrar el usuario."));
+            }
         });
 
         post("/proyecto", (request, response) -> {
@@ -193,11 +202,19 @@ public class GestorDeIncidencias {
 
         delete("/proyecto/:id", (request, response) -> {
             response.type("application/json");
-            proyectoService.deleteProyecto(Integer.parseInt(request.params(":id")));
-            return customGson.toJson(new StandardResponse(
-                    StatusResponse.SUCCESS,
-                    "Integrante borrado"
-            ));
+            int proyectoId = Integer.parseInt(request.params(":id"));
+            if(incidenteService.getIncidentesAbiertosPorProyecto(proyectoId).isEmpty()) {
+                proyectoService.deleteProyecto(proyectoId);
+                return customGson.toJson(new StandardResponse(
+                        StatusResponse.SUCCESS,
+                        "Proyecto borrado."
+                ));
+            } else {
+                return customGson.toJson(new StandardResponse(
+                        StatusResponse.ERROR,
+                        "Error al borrar el proyecto."
+                ));
+            }
         });
 
         post("/incidente", (request, response) -> {

@@ -22,7 +22,7 @@ public class IncidenteServiceMapImpl implements IncidenteService {
         return incidenteMap.get(id);
     }
 
-    public Incidente editTextoDescripcion(Incidente incidente) {
+    public Incidente patchTextoDescripcion(Incidente incidente) {
         Incidente incidenteEditar = incidenteMap.get(incidente.getId());
         if(incidente.getDescripcion() != null) {
             incidenteEditar.setDescripcion(incidente.getDescripcion());
@@ -30,7 +30,7 @@ public class IncidenteServiceMapImpl implements IncidenteService {
         return incidenteEditar;
     }
 
-    public Incidente editEstado(int id) {
+    public Incidente patchEstado(int id) {
         Incidente incidenteEditar = incidenteMap.get(id);
         incidenteEditar.setEstado(Estado.RESUELTO);
         return incidenteEditar;
@@ -60,6 +60,14 @@ public class IncidenteServiceMapImpl implements IncidenteService {
     public Collection<Incidente> getIncidentesAbiertos() {
         return incidenteMap.values()
                 .stream()
+                .filter(i -> i.getEstado() == Estado.ASIGNADO)
+                .collect(Collectors.toList());
+    }
+
+    public Collection<Incidente> getIncidentesAbiertosPorProyecto(int proyectoId) {
+        return incidenteMap.values()
+                .stream()
+                .filter(i -> i.getProyecto().getId() == proyectoId)
                 .filter(i -> i.getEstado() == Estado.ASIGNADO)
                 .collect(Collectors.toList());
     }
