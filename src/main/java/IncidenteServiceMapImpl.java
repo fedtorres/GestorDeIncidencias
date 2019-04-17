@@ -1,4 +1,5 @@
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -12,14 +13,6 @@ public class IncidenteServiceMapImpl implements IncidenteService {
 
     public void addIncidente(Incidente incidente) {
         incidenteMap.put(incidente.getId(), incidente);
-    }
-
-    public Collection<Incidente> getIncidentes() {
-        return incidenteMap.values();
-    }
-
-    public Incidente getIncidente(int id) {
-        return incidenteMap.get(id);
     }
 
     public Incidente patchTextoDescripcion(int id, String texto) throws IncidenteException {
@@ -44,6 +37,7 @@ public class IncidenteServiceMapImpl implements IncidenteService {
             }
             Incidente incidentePatch = incidenteMap.get(id);
             incidentePatch.setEstado(Estado.RESUELTO);
+            incidentePatch.setFechaDeSolucion(new Date());
             return incidentePatch;
         } catch (Exception exception) {
             throw new IncidenteException(exception.getMessage());
@@ -74,14 +68,6 @@ public class IncidenteServiceMapImpl implements IncidenteService {
     public Collection<Incidente> getIncidentesAbiertos() {
         return incidenteMap.values()
                 .stream()
-                .filter(i -> i.getEstado() == Estado.ASIGNADO)
-                .collect(Collectors.toList());
-    }
-
-    public Collection<Incidente> getIncidentesAbiertosPorProyecto(int proyectoId) {
-        return incidenteMap.values()
-                .stream()
-                .filter(i -> i.getProyecto().getId() == proyectoId)
                 .filter(i -> i.getEstado() == Estado.ASIGNADO)
                 .collect(Collectors.toList());
     }

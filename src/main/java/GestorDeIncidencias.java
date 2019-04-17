@@ -113,7 +113,12 @@ public class GestorDeIncidencias {
         put("/usuario", (request, response) -> {
             response.type("application/json");
             Usuario usuario = customGson.fromJson(request.body(), Usuario.class);
-            Usuario usuarioEditado = usuarioService.editUsuario(usuario);
+            Usuario usuarioEditado = null;
+            try {
+                usuarioEditado = usuarioService.editUsuario(usuario);
+            } catch (Exception exception) {
+                usuarioEditado = null;
+            }
             if(usuario != null) {
                 return customGson.toJson(new StandardResponse(
                         StatusResponse.SUCCESS,
@@ -185,7 +190,12 @@ public class GestorDeIncidencias {
         put("/proyecto", (request, response) -> {
             response.type("application/json");
             Proyecto proyecto = customGson.fromJson(request.body(), Proyecto.class);
-            Proyecto proyectoEditado = proyectoService.editProyecto(proyecto);
+            Proyecto proyectoEditado = null;
+            try {
+                proyectoEditado = proyectoService.editProyecto(proyecto);
+            } catch (ProyectoException exception) {
+                proyectoEditado = null;
+            }
             if(proyectoEditado != null) {
                 return customGson.toJson(new StandardResponse(
                         StatusResponse.SUCCESS,
@@ -248,26 +258,36 @@ public class GestorDeIncidencias {
            JsonParser jsonParser = new JsonParser();
            JsonObject jsonObject = jsonParser.parse(request.body()).getAsJsonObject();
            String texto = jsonObject.get("texto").getAsString();
-           Incidente incidentePatch = incidenteService.patchTextoDescripcion(
-                   Integer.parseInt(request.params(":id")),
-                   texto);
-            if(incidentePatch != null) {
-                return customGson.toJson(new StandardResponse(
-                        StatusResponse.SUCCESS,
-                        customGson.toJsonTree(
-                                incidentePatch
-                        )));
-            } else {
-                return customGson.toJson(new StandardResponse(
-                        StatusResponse.ERROR,
-                        "Error al añadir texto a la descripción del incidente."
-                ));
-            }
+           Incidente incidentePatch = null;
+           try {
+               incidentePatch = incidenteService.patchTextoDescripcion(
+                       Integer.parseInt(request.params(":id")),
+                       texto);
+           } catch (IncidenteException exception) {
+               incidentePatch = null;
+           }
+           if(incidentePatch != null) {
+               return customGson.toJson(new StandardResponse(
+                       StatusResponse.SUCCESS,
+                       customGson.toJsonTree(
+                               incidentePatch
+                       )));
+           } else {
+               return customGson.toJson(new StandardResponse(
+                       StatusResponse.ERROR,
+                       "Error al añadir texto a la descripción del incidente."
+               ));
+           }
         });
 
         patch("/incidente/:id/resuelto", (request, response) -> {
             response.type("application/json");
-            Incidente incidentePatch = incidenteService.patchEstado(Integer.parseInt(request.params(":id")));
+            Incidente incidentePatch = null;
+            try {
+                incidentePatch = incidenteService.patchEstado(Integer.parseInt(request.params(":id")));
+            } catch (IncidenteException exception) {
+                incidentePatch = null;
+            }
             if(incidentePatch != null) {
                 return customGson.toJson(new StandardResponse(
                         StatusResponse.SUCCESS,
